@@ -1,0 +1,22 @@
+package com.gespyme.domain.filter;
+
+import com.gespyme.commons.repository.criteria.SearchCriteria;
+import com.gespyme.commons.repository.criteria.SearchOperation;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Objects;
+
+@Component
+public class TaxRateInvoiceFilter implements FieldFilter {
+
+    @Override
+    public boolean apply(InvoiceFilter invoiceFilter) {
+        return Objects.nonNull(invoiceFilter.getTaxRate());
+    }
+
+    @Override
+    public void addSearchCriteria(InvoiceFilter invoiceFilter, List<SearchCriteria> searchCriteriaList) {
+        searchCriteriaList.add(SearchCriteria.builder().key("tax_rate").operation(SearchOperation.EQUAL).value(invoiceFilter.getTaxRate()).build());
+    }
+}
