@@ -10,8 +10,10 @@ import com.gespyme.commons.validator.ValidatorService;
 import com.gespyme.domain.invoiceorder.model.InvoiceOrder;
 import com.gespyme.infrastructure.mapper.InvoiceOrderMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -27,29 +29,31 @@ public class InvoiceOrderController {
 
 
     @GetMapping("/{invoiceOrderId}")
-    public InvoiceOrderModelApi getInvoiceOrderById(@PathVariable("invoiceOrderId") String invoiceOrderId) {
+    public ResponseEntity<InvoiceOrderModelApi> getInvoiceOrderById(@PathVariable("invoiceOrderId") String invoiceOrderId) {
         validatorService.validateId(invoiceOrderId);
         InvoiceOrder invoiceOrder = findInvoiceOrderByIdUseCase.getInvoiceOrderById(invoiceOrderId);
-        return invoiceOrderMapper.map(invoiceOrder);
+        return ResponseEntity.ok(invoiceOrderMapper.map(invoiceOrder));
     }
 
     @DeleteMapping("/{invoiceOrderId}")
-    public void deleteInvoiceOrder(@PathVariable("invoiceOrderId") String invoiceOrderId) {
+    public ResponseEntity<Void> deleteInvoiceOrder(@PathVariable("invoiceOrderId") String invoiceOrderId) {
         validatorService.validateId(invoiceOrderId);
         deleteInvoiceOrderUseCase.deleteInvoiceOrder(invoiceOrderId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping
-    public String createInvoiceOrder(@RequestBody InvoiceOrderModelApi invoiceOrderApiModel) {
+    public ResponseEntity<InvoiceOrderModelApi> createInvoiceOrder(@RequestBody InvoiceOrderModelApi invoiceOrderApiModel) {
         validatorService.validate(invoiceOrderApiModel, List.of(Validator.ALL_PARAMS_NOT_NULL));
         InvoiceOrder invoiceOrder = createInvoiceOrderUseCase.createInvoiceOrder(invoiceOrderMapper.map(invoiceOrderApiModel));
-        return invoiceOrder.getInvoiceOrderId();
+        URI location = URI.create("/invoiceOrder/" + invoiceOrder.getInvoiceOrderId());
+        return ResponseEntity.created(location).body(invoiceOrderMapper.map(invoiceOrder));
     }
 
     @PatchMapping("/{invoiceOrderId}")
-    public InvoiceOrderModelApi modifyInvoiceOrder(@PathVariable("invoiceOrderId") String invoiceOrderId, @RequestBody InvoiceOrderModelApi invoiceOrderApiModel) {
+    public ResponseEntity<InvoiceOrderModelApi> modifyInvoiceOrder(@PathVariable("invoiceOrderId") String invoiceOrderId, @RequestBody InvoiceOrderModelApi invoiceOrderApiModel) {
         validatorService.validate(invoiceOrderApiModel, List.of(Validator.ONE_PARAM_NOT_NULL));
         InvoiceOrder invoiceOrder = modifyInvoiceOrderUseCase.modifyInvoiceOrder(invoiceOrderId, invoiceOrderMapper.map(invoiceOrderApiModel));
-        return invoiceOrderMapper.map(invoiceOrder);
+        return ResponseEntity.ok(invoiceOrderMapper.map(invoiceOrder));
     }
 }

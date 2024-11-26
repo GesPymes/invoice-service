@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class InvoiceTaxRateFilterQueryField implements QueryField {
+public class InvoiceTaxRateQueryField implements QueryField {
 
-    private final PredicateBuilder<String> predicateBuilder;
+    private final PredicateBuilder<Integer> predicateBuilder;
 
     @Override
     public String getFieldName() {

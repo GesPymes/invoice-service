@@ -26,13 +26,13 @@ public class InvoiceDataEntity {
     private String customerId;
 
     @Column(name = "subtotal_amount")
-    private String subtotalAmount;
+    private Integer subtotalAmount;
 
     @Column(name = "tax_rate")
-    private String taxRate;
+    private Integer taxRate;
 
     @Column(name = "total_amount")
-    private String totalAmount;
+    private Integer totalAmount;
 
     @Column(name = "description")
     private String description;

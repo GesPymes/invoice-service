@@ -8,16 +8,16 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Objects;
 
-
 @Component
-public class InvoiceStatusFilter implements FieldFilter<InvoiceFilter> {
+public class DescriptionFilter implements FieldFilter<InvoiceFilter> {
+
     @Override
     public boolean apply(InvoiceFilter invoiceFilter) {
-        return Objects.nonNull(invoiceFilter.getStatus());
+        return Objects.nonNull(invoiceFilter.getDescription());
     }
 
     @Override
     public void addSearchCriteria(InvoiceFilter invoiceFilter, List<SearchCriteria> searchCriteriaList) {
-        searchCriteriaList.add(SearchCriteria.builder().key("status").operation(SearchOperation.EQUAL).value(invoiceFilter.getStatus()).build());
+        searchCriteriaList.add(SearchCriteria.builder().key("description").operation(SearchOperation.LIKE).value(invoiceFilter.getDescription()).build());
     }
 }

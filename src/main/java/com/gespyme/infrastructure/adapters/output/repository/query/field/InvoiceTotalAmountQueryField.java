@@ -10,17 +10,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class InvoiceSubtotalAmountQueryField implements QueryField {
+public class InvoiceTotalAmountQueryField implements QueryField {
 
     private final PredicateBuilder<Integer> predicateBuilder;
 
     @Override
     public String getFieldName() {
-        return "subtotal_amount";
+        return "total_amount";
     }
 
     @Override
     public void addToQuery(BooleanBuilder booleanBuilder, SearchCriteria searchCriteria) {
-        booleanBuilder.and(predicateBuilder.getBooleanBuilder(QInvoiceDataEntity.invoiceDataEntity.subtotalAmount, searchCriteria));
+        booleanBuilder.and(predicateBuilder.getBooleanBuilder(QInvoiceDataEntity.invoiceDataEntity.totalAmount, searchCriteria));
     }
 }

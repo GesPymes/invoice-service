@@ -1,8 +1,8 @@
 package com.gespyme.application.invoicedata.port.output;
 
 import com.gespyme.application.invoicedata.usecase.FindInvoiceDataUseCase;
+import com.gespyme.commons.model.filter.FieldFilter;
 import com.gespyme.commons.repository.criteria.SearchCriteria;
-import com.gespyme.domain.filter.FieldFilter;
 import com.gespyme.domain.filter.InvoiceFilter;
 import com.gespyme.domain.invoicedata.model.InvoiceData;
 import com.gespyme.domain.invoicedata.repository.InvoiceDataRepository;
@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FindInvoiceDataPort implements FindInvoiceDataUseCase {
     private final InvoiceDataRepository invoiceDataRepository;
-    private final List<FieldFilter> invoiceDataFilters;
+    private final List<FieldFilter<InvoiceFilter>> invoiceDataFilters;
 
     public List<InvoiceData> findInvoiceData(InvoiceFilter invoiceFilter) {
         List<SearchCriteria> searchCriterias = new ArrayList<>();

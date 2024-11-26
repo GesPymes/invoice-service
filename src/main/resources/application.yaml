@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3308/invoice_database
+    url: jdbc:mysql://localhost:3310/invoice_database
     username: admin
     password: admin-gespyme-2024-99Pabcde
     driver-class-name: com.mysql.cj.jdbc.Driver

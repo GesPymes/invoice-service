@@ -8,5 +8,6 @@ public class InvoiceFilter {
     private Integer taxRate;
     private Integer totalAmount;
     private String customerName;
+    private String description;
     private String status;
 }

@@ -56,19 +56,19 @@ public class InvoiceDataRepositoryImpl implements InvoiceDataRepository {
     }
 
     private List<Tuple> executeQueryWithPredicate(QInvoiceDataEntity invoiceData, QInvoiceOrderEntity invoiceOrder, BooleanBuilder booleanBuilder, JPAQuery<InvoiceDataEntity> query) {
-        return query.select(invoiceData.subtotalAmount, invoiceData.taxRate, invoiceData.totalAmount, invoiceOrder.status).where(booleanBuilder).fetch();
+        return query.select(invoiceData.subtotalAmount, invoiceData.taxRate, invoiceData.totalAmount, invoiceData.description, invoiceOrder.status).where(booleanBuilder).fetch();
     }
 
     private List<Tuple> executeQueryWithoutPredicate(QInvoiceDataEntity invoiceData, QInvoiceOrderEntity invoiceOrder, JPAQuery<InvoiceDataEntity> query) {
-        return query.select(invoiceData.subtotalAmount, invoiceData.taxRate, invoiceData.totalAmount, invoiceOrder.status).fetch();
+        return query.select(invoiceData.subtotalAmount, invoiceData.taxRate, invoiceData.totalAmount, invoiceData.description, invoiceOrder.status).fetch();
     }
 
     private InvoiceData mapTuple(Tuple tuple, QInvoiceDataEntity invoiceData, QInvoiceOrderEntity invoiceOrder) {
         return InvoiceData.builder()
-                .subtotalAmount(Integer.parseInt(tuple.get(invoiceData.subtotalAmount)))
-                .totalAmount(Integer.parseInt(tuple.get(invoiceData.subtotalAmount)))
-                //.description(tuple.get(invoiceData.))
-                .taxRate(Integer.parseInt(tuple.get(invoiceData.taxRate)))
+                .subtotalAmount(tuple.get(invoiceData.subtotalAmount))
+                .totalAmount(tuple.get(invoiceData.totalAmount))
+                .description(tuple.get(invoiceData.description))
+                .taxRate(tuple.get(invoiceData.taxRate))
                 .status(tuple.get(invoiceOrder.status))
                 .build();
     }
