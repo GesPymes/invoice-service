@@ -8,16 +8,17 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-
-@Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+    componentModel = MappingConstants.ComponentModel.SPRING)
 public interface InvoiceOrderMapper {
-    InvoiceOrder map(InvoiceOrderModelApi invoiceOrderModelApi);
+  InvoiceOrder map(InvoiceOrderModelApi invoiceOrderModelApi);
 
-    InvoiceOrderModelApi map(InvoiceOrder invoiceOrder);
+  InvoiceOrderModelApi map(InvoiceOrder invoiceOrder);
 
-    InvoiceOrder map(InvoiceOrderEntity invoiceOrderEntity);
+  InvoiceOrder map(InvoiceOrderEntity invoiceOrderEntity);
 
-    InvoiceOrderEntity mapToEntity(InvoiceOrder invoiceOrder);
+  InvoiceOrderEntity mapToEntity(InvoiceOrder invoiceOrder);
 
-    InvoiceOrder merge(InvoiceOrder newInvoiceOrder, @MappingTarget InvoiceOrder invoiceOrder);
+  InvoiceOrder merge(InvoiceOrder newInvoiceOrder, @MappingTarget InvoiceOrder invoiceOrder);
 }

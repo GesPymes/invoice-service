@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class CreateInvoiceDataPort implements CreateInvoiceDataUseCase {
-    private final InvoiceDataRepository repository;
+  private final InvoiceDataRepository repository;
 
-    public InvoiceData createInvoiceData(InvoiceData invoiceData) {
-        return repository.save(invoiceData);
-    }
+  public InvoiceData createInvoiceData(InvoiceData invoiceData) {
+    return repository.save(invoiceData);
+  }
 }

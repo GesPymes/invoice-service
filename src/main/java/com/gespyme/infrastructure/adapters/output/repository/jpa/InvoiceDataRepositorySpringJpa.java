@@ -6,5 +6,6 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface InvoiceDataRepositorySpringJpa extends JpaRepository<InvoiceDataEntity, String>, QuerydslPredicateExecutor<InvoiceDataEntity> {
-}
+public interface InvoiceDataRepositorySpringJpa
+    extends JpaRepository<InvoiceDataEntity, String>,
+        QuerydslPredicateExecutor<InvoiceDataEntity> {}

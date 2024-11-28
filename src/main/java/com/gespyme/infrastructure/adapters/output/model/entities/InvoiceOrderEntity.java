@@ -13,18 +13,16 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "INVOICE_ORDER")
 public class InvoiceOrderEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String invoiceOrderId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private String invoiceOrderId;
 
-    @Column(name = "invoice_data_id")
-    private String invoiceDataId;
+  @Column(name = "invoice_data_id")
+  private String invoiceDataId;
 
-    @Column(name = "appointment_id")
-    private String appointmentId;
+  @Column(name = "appointment_id")
+  private String appointmentId;
 
-    @Column(name = "status")
-    private String status;
-
+  @Column(name = "status")
+  private String status;
 }
-

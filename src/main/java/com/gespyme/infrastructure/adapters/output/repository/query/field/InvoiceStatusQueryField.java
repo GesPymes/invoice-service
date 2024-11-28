@@ -11,15 +11,17 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class InvoiceStatusQueryField implements QueryField {
-    private final PredicateBuilder<String> predicateBuilder;
+  private final PredicateBuilder<String> predicateBuilder;
 
-    @Override
-    public String getFieldName() {
-        return "status";
-    }
+  @Override
+  public String getFieldName() {
+    return "status";
+  }
 
-    @Override
-    public void addToQuery(BooleanBuilder booleanBuilder, SearchCriteria searchCriteria) {
-        booleanBuilder.and(predicateBuilder.getBooleanBuilder(QInvoiceOrderEntity.invoiceOrderEntity.status, searchCriteria));
-    }
+  @Override
+  public void addToQuery(BooleanBuilder booleanBuilder, SearchCriteria searchCriteria) {
+    booleanBuilder.and(
+        predicateBuilder.getBooleanBuilder(
+            QInvoiceOrderEntity.invoiceOrderEntity.status, searchCriteria));
+  }
 }

@@ -12,15 +12,17 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class InvoiceTaxRateQueryField implements QueryField {
 
-    private final PredicateBuilder<Integer> predicateBuilder;
+  private final PredicateBuilder<Integer> predicateBuilder;
 
-    @Override
-    public String getFieldName() {
-        return "tax_rate";
-    }
+  @Override
+  public String getFieldName() {
+    return "tax_rate";
+  }
 
-    @Override
-    public void addToQuery(BooleanBuilder booleanBuilder, SearchCriteria searchCriteria) {
-        booleanBuilder.and(predicateBuilder.getBooleanBuilder(QInvoiceDataEntity.invoiceDataEntity.taxRate, searchCriteria));
-    }
+  @Override
+  public void addToQuery(BooleanBuilder booleanBuilder, SearchCriteria searchCriteria) {
+    booleanBuilder.and(
+        predicateBuilder.getBooleanBuilder(
+            QInvoiceDataEntity.invoiceDataEntity.taxRate, searchCriteria));
+  }
 }
