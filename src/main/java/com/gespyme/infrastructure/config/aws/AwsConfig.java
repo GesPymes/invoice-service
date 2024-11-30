@@ -1,5 +1,6 @@
 package com.gespyme.infrastructure.config.aws;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.regions.Region;
@@ -10,18 +11,18 @@ import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider
 @Configuration
 public class AwsConfig {
 
-  // @Value("${aws.roleArn}")
-  private final String roleArn = "arn:aws:iam::442042545308:role/gespyme-s3";
+  @Value("${aws.roleArn}")
+  private  String roleArn;
 
-  // @Value("${aws.rolename}")
-  private final String roleSessionName = "SpringAppSession";
+  @Value("${aws.region}")
+  private  String region;
 
-  // @Value("${aws.region}")
-  private final Region region = Region.EU_NORTH_1;
+  @Value("${aws.roleSessionName}")
+  private  String roleSessionName;
 
   @Bean
   public StsAssumeRoleCredentialsProvider getCredentialsProvider() {
-    StsClient stsClient = StsClient.builder().region(region).build();
+    StsClient stsClient = StsClient.builder().region(Region.of(region)).build();
 
     return StsAssumeRoleCredentialsProvider.builder()
         .stsClient(stsClient)
@@ -32,6 +33,6 @@ public class AwsConfig {
 
   @Bean
   public S3Client s3Client(StsAssumeRoleCredentialsProvider credentialsProvider) {
-    return S3Client.builder().region(region).credentialsProvider(credentialsProvider).build();
+    return S3Client.builder().region(Region.of(region)).credentialsProvider(credentialsProvider).build();
   }
 }

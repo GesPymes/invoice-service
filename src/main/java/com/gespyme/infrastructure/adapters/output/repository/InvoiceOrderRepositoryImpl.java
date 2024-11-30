@@ -1,8 +1,12 @@
 package com.gespyme.infrastructure.adapters.output.repository;
 
 import com.gespyme.commons.exeptions.InternalServerError;
+import com.gespyme.commons.exeptions.NotFoundException;
+import com.gespyme.commons.repository.QueryField;
+import com.gespyme.commons.repository.criteria.SearchCriteria;
 import com.gespyme.domain.invoicedata.model.InvoiceData;
 import com.gespyme.domain.invoiceorder.model.InvoiceOrder;
+import com.gespyme.domain.invoiceorder.model.InvoiceStatus;
 import com.gespyme.domain.invoiceorder.repository.InvoiceOrderRepository;
 import com.gespyme.infrastructure.adapters.output.autofirma.AutofirmaService;
 import com.gespyme.infrastructure.adapters.output.aws.S3Repository;
@@ -10,32 +14,55 @@ import com.gespyme.infrastructure.adapters.output.model.entities.InvoiceOrderEnt
 import com.gespyme.infrastructure.adapters.output.pdf.PdfModificationService;
 import com.gespyme.infrastructure.adapters.output.repository.jpa.InvoiceOrderRepositorySpringJpa;
 import com.gespyme.infrastructure.mapper.InvoiceOrderMapper;
+import com.querydsl.core.BooleanBuilder;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class InvoiceOrderRepositoryImpl implements InvoiceOrderRepository {
 
-  // @Value("${aws.keyPath}")
-  private String pendingKeyPath = "invoice/pending/";
+  @Value("${aws.s3.pendingkeypath}")
+  private String pendingKeyPath;
 
-  // @Value("${aws.keyPath}")
-  private String signedKeyPath = "invoice/signed/";
+  @Value("${aws.s3.signedkeypath}")
+  private String signedKeyPath;
 
-  // @Value("${sign.tempdirectory}")
-  private String outputSignedTempDirectory = "target/generated-sources/temp";
+  @Value("${sign.tempdirectory}")
+  private String outputSignedTempDirectory;
 
   private final InvoiceOrderRepositorySpringJpa invoiceOrderJpaRepository;
   private final PdfModificationService pdfModificationService;
   private final AutofirmaService autofirmaService;
   private final InvoiceOrderMapper mapper;
   private final S3Repository s3Repository;
+  private final Map<String, QueryField> queryFieldMap;
+
+  public InvoiceOrderRepositoryImpl(
+      InvoiceOrderRepositorySpringJpa invoiceOrderJpaRepository,
+      PdfModificationService pdfModificationService,
+      AutofirmaService autofirmaService,
+      InvoiceOrderMapper mapper,
+      S3Repository s3Repository,
+      List<QueryField> queryFields) {
+    this.invoiceOrderJpaRepository = invoiceOrderJpaRepository;
+    this.pdfModificationService = pdfModificationService;
+    this.autofirmaService = autofirmaService;
+    this.mapper = mapper;
+    this.s3Repository = s3Repository;
+    queryFieldMap =
+        queryFields.stream()
+            .collect(Collectors.toMap(QueryField::getFieldName, queryField -> queryField));
+  }
 
   @Override
   public Optional<InvoiceOrder> findById(String id) {
@@ -43,7 +70,17 @@ public class InvoiceOrderRepositoryImpl implements InvoiceOrderRepository {
   }
 
   @Override
-  public void deleteById(String id) {
+  public void deleteById(String id) throws NotFoundException {
+    Optional<InvoiceOrderEntity> invoiceOrder = invoiceOrderJpaRepository.findById(id);
+    String status =
+        invoiceOrder
+            .map(InvoiceOrderEntity::getStatus)
+            .orElseThrow(() -> new NotFoundException("id not found"));
+    if (InvoiceStatus.SIGNED.toString().equals(status)) {
+      s3Repository.deleteInvoiceFromS3(signedKeyPath + "Invoice-" + id + "signed.pdf");
+    } else {
+      s3Repository.deleteInvoiceFromS3(pendingKeyPath + "Invoice-" + id + ".pdf");
+    }
     invoiceOrderJpaRepository.deleteById(id);
   }
 
@@ -76,8 +113,11 @@ public class InvoiceOrderRepositoryImpl implements InvoiceOrderRepository {
   public void singInvoice(String invoiceId) {
     String objectKey = pendingKeyPath + getInvoiceFileName(invoiceId, false);
     String key = "/Invoice-" + invoiceId + ".pdf";
-    File file = new File(key);
-    createDirIfNotExist(file);
+
+    createDirectories();
+
+    File file = new File(outputSignedTempDirectory + "/created" + key);
+
     try (InputStream invoice = s3Repository.downloadInvoiceFromS3(objectKey);
         FileOutputStream fileOutputStream = new FileOutputStream(file)) {
       byte[] buffer = new byte[1024];
@@ -98,6 +138,16 @@ public class InvoiceOrderRepositoryImpl implements InvoiceOrderRepository {
     return s3Repository.downloadInvoiceFromS3(invoiceId);
   }
 
+  @Override
+  public List<InvoiceOrder> findByCriteria(List<SearchCriteria> searchCriteria) {
+    BooleanBuilder booleanBuilder = new BooleanBuilder();
+    searchCriteria.stream()
+        .forEach(sc -> queryFieldMap.get(sc.getKey()).addToQuery(booleanBuilder, sc));
+    List<InvoiceOrderEntity> entities =
+        (List<InvoiceOrderEntity>) invoiceOrderJpaRepository.findAll(booleanBuilder);
+    return mapper.map(entities);
+  }
+
   private String getInvoiceFileName(String invoiceId, boolean signed) {
     StringBuilder sb = new StringBuilder();
     sb.append("Invoice-");
@@ -109,13 +159,24 @@ public class InvoiceOrderRepositoryImpl implements InvoiceOrderRepository {
     return sb.toString();
   }
 
-  private void cleanDirectory() {
-
+  private void createDirectories() {
+    File inputDir = new File(outputSignedTempDirectory + "/created");
+    File outputDir = new File(outputSignedTempDirectory + "/signed");
+    createDirIfNotExist(inputDir);
+    createDirIfNotExist(outputDir);
+    cleanTempFolder(inputDir);
+    cleanTempFolder(outputDir);
   }
 
-  private void createDirIfNotExist(File file) {
-    if (!file.exists()) {
-      if (file.mkdirs()) {
+  private void cleanTempFolder(File dir) {
+    if (dir.exists() && dir.listFiles() != null) {
+      Arrays.stream(dir.listFiles()).forEach(File::delete);
+    }
+  }
+
+  private void createDirIfNotExist(File dir) {
+    if (!dir.exists()) {
+      if (dir.mkdirs()) {
         throw new InternalServerError("Cannot create directory");
       }
     }

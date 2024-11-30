@@ -4,6 +4,7 @@ import com.gespyme.commons.exeptions.InternalServerError;
 import com.gespyme.infrastructure.adapters.output.aws.S3Repository;
 import java.io.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,40 +13,37 @@ public class AutofirmaService {
 
   private final S3Repository s3Repository;
 
-  // @Value("${autofirma.certificatepath}")
-  private String certificatePath =
-      "C:\\Users\\sary_\\Desktop\\ESTUDIOS\\UOC\\CUARTO\\TFG\\repository\\invoice-service\\src\\main\\resources\\MOLINA_DELGADO_SARA___52005699P.p12";
+  @Value("${autofirma.certificatepath}")
+  private String certificatePath;
 
-  // @Value("${autofirma.filter}")
-  private String filter = "52005699P";
+  @Value("${autofirma.certificatename}")
+  private String certificateName;
 
-  // @Value("${autofirma.password}")
-  private String password = "55155606alaska";
+  @Value("${autofirma.filter}")
+  private String filter;
 
-  // @Value("${autofirma.outputFile}")
-  private String outputFilePath =
-      "C:\\Users\\sary_\\Desktop\\ESTUDIOS\\UOC\\CUARTO\\TFG\\repository\\invoice-service\\target\\generated-sources\\";
+  @Value("${autofirma.password}")
+  private String password;
 
-  // @Value("${autofirma.inputFile}")
-  private String inputFilePath =
-      "C:\\Users\\sary_\\Desktop\\ESTUDIOS\\UOC\\CUARTO\\TFG\\repository\\invoice-service\\target\\generated-sources\\";
+  @Value("${autofirma.inputfilepath}")
+  private String inputFilePath;
 
-  private static final String SING_COMMAND =
-      "AutoFirma sign "
-          + "-i C:\\Users\\sary_\\Desktop\\ESTUDIOS\\UOC\\CUARTO\\TFG\\repository\\invoice-service\\src\\main\\resources\\cat1-saramolina.pdf "
-          + "-o C:\\Users\\sary_\\Desktop\\ESTUDIOS\\UOC\\CUARTO\\TFG\\repository\\invoice-service\\src\\main\\resources\\cat1-saramolina-signed.pdf "
-          + "-store pkcs12:C:\\Users\\sary_\\Desktop\\ESTUDIOS\\UOC\\CUARTO\\TFG\\repository\\invoice-service\\src\\main\\resources\\MOLINA_DELGADO_SARA___52005699P.p12 "
-          + "-filter 52005699P "
-          + "-password 55155606alaska > log.log";
+  @Value("${autofirma.outputfilepath}")
+  private String outputFilePath;
 
   public byte[] getSignedFile(String inputFileName) {
     try {
-      String command = getCommand(inputFileName);
+      String absoluteInputPath = resolvePath(inputFilePath) + "\\";
+      String absoluteOutputPath = resolvePath(outputFilePath) + "\\";
+      String absoluteCertPath = resolvePath(certificatePath) + "\\" + certificateName + "\\";
+
+      String command =
+          getCommand(inputFileName, absoluteInputPath, absoluteOutputPath, absoluteCertPath);
       Process process = Runtime.getRuntime().exec(new String[] {"cmd.exe", "/c", command});
       process.onExit();
       int exitCode = process.waitFor();
 
-      File file = new File(outputFilePath + "Invoice-" + inputFileName + "-signed.pdf");
+      File file = new File(absoluteOutputPath + "Invoice-" + inputFileName + "-signed.pdf");
 
       return fileToByteArray(file);
 
@@ -66,25 +64,33 @@ public class AutofirmaService {
     }
   }
 
-  private String getCommand(String fileName) {
+  private String getCommand(
+      String fileName,
+      String absolutInputPath,
+      String absolutOutputPath,
+      String getAbsoluteCertPath) {
     StringBuilder sb = new StringBuilder();
     sb.append("AutoFirma sign -i ")
-        .append(inputFilePath)
+        .append(absolutInputPath)
         .append("Invoice-")
         .append(fileName)
         .append(".pdf")
         .append(" -o ")
-        .append(outputFilePath)
+        .append(absolutOutputPath)
         .append("Invoice-")
         .append(fileName)
         .append("-signed.pdf")
         .append(" -store pkcs12:")
-        .append(certificatePath)
+        .append(getAbsoluteCertPath)
         .append(" -filter ")
         .append(filter)
         .append(" -password ")
         .append(password)
-        .append("> log.log");
+            .append("> log.log");
     return sb.toString();
+  }
+
+  private String resolvePath(String relativePath) {
+    return new File(relativePath).getAbsolutePath();
   }
 }

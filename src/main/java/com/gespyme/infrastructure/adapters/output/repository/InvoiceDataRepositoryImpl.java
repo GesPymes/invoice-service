@@ -4,7 +4,6 @@ import com.gespyme.commons.repository.QueryField;
 import com.gespyme.commons.repository.criteria.SearchCriteria;
 import com.gespyme.domain.invoicedata.model.InvoiceData;
 import com.gespyme.domain.invoicedata.repository.InvoiceDataRepository;
-import com.gespyme.infrastructure.adapters.input.rest.customer.CustomerApiRestCallService;
 import com.gespyme.infrastructure.adapters.output.model.entities.InvoiceDataEntity;
 import com.gespyme.infrastructure.adapters.output.model.entities.QInvoiceDataEntity;
 import com.gespyme.infrastructure.adapters.output.model.entities.QInvoiceOrderEntity;
@@ -33,8 +32,7 @@ public class InvoiceDataRepositoryImpl implements InvoiceDataRepository {
       List<QueryField> queryFields,
       InvoiceDataRepositorySpringJpa invoiceDataRepositorySpringJpa,
       JPAQueryFactory queryFactory,
-      InvoiceDataMapper mapper,
-      CustomerApiRestCallService customerApiRestCallService) {
+      InvoiceDataMapper mapper) {
     this.invoiceDataRepositorySpringJpa = invoiceDataRepositorySpringJpa;
     this.queryFactory = queryFactory;
     this.mapper = mapper;

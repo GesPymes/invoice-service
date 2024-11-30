@@ -1,12 +1,13 @@
 package com.gespyme.infrastructure.adapters.input.controller;
 
 import com.gespyme.application.invoiceorder.usecase.*;
+import com.gespyme.commons.model.invoice.InvoiceOrderBaseModelApi;
+import com.gespyme.commons.model.invoice.InvoiceOrderFilterModelApi;
 import com.gespyme.commons.model.invoice.InvoiceOrderModelApi;
 import com.gespyme.commons.validator.Validator;
 import com.gespyme.commons.validator.ValidatorService;
 import com.gespyme.domain.invoiceorder.model.InvoiceOrder;
 import com.gespyme.infrastructure.mapper.InvoiceOrderMapper;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -30,7 +31,8 @@ public class InvoiceOrderController {
   private final SendInvoiceUseCase sendInvoiceUseCase;
   private final DownloadInvoiceUseCase downloadInvoiceUseCase;
   private final SignInvoiceUseCase signInvoiceUseCase;
-  private final ValidatorService<InvoiceOrderModelApi> validatorService;
+  private final FindInvoiceOrderUseCase findInvoiceOrderUseCase;
+  private final ValidatorService<InvoiceOrderBaseModelApi> validatorService;
 
   @GetMapping("/{invoiceOrderId}")
   public ResponseEntity<InvoiceOrderModelApi> getInvoiceOrderById(
@@ -38,6 +40,15 @@ public class InvoiceOrderController {
     validatorService.validateId(invoiceOrderId);
     InvoiceOrder invoiceOrder = findInvoiceOrderByIdUseCase.getInvoiceOrderById(invoiceOrderId);
     return ResponseEntity.ok(invoiceOrderMapper.map(invoiceOrder));
+  }
+
+  @GetMapping("/")
+  public ResponseEntity<List<InvoiceOrderModelApi>> getInvoiceOrderById(
+      InvoiceOrderFilterModelApi invoiceOrderFilter) {
+    validatorService.validate(invoiceOrderFilter, List.of(Validator.ONE_PARAM_NOT_NULL));
+    List<InvoiceOrder> invoiceOrder =
+        findInvoiceOrderUseCase.findInvoiceOrder(invoiceOrderMapper.map(invoiceOrderFilter));
+    return ResponseEntity.ok(invoiceOrderMapper.mapToList(invoiceOrder));
   }
 
   @DeleteMapping("/{invoiceOrderId}")
@@ -77,7 +88,8 @@ public class InvoiceOrderController {
   }
 
   @GetMapping("/{invoiceOrderId}/download")
-  public ResponseEntity<InputStreamResource> downloadInvoice(@PathVariable("invoiceOrderId") String invoiceOrderId) throws IOException {
+  public ResponseEntity<InputStreamResource> downloadInvoice(
+      @PathVariable("invoiceOrderId") String invoiceOrderId)  {
     validatorService.validateId(invoiceOrderId);
     String signedKeyPath = "invoice/signed/";
     String key = signedKeyPath + invoiceOrderId;
@@ -85,8 +97,8 @@ public class InvoiceOrderController {
     HttpHeaders headers = new HttpHeaders();
     headers.add("Content-Disposition", "attachment; filename=" + invoiceOrderId);
     return ResponseEntity.ok()
-            .headers(headers)
-            .contentType(MediaType.APPLICATION_PDF)
-            .body(new InputStreamResource(inputStream));
+        .headers(headers)
+        .contentType(MediaType.APPLICATION_PDF)
+        .body(new InputStreamResource(inputStream));
   }
 }

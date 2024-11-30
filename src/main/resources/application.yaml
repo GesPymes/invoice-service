@@ -16,3 +16,29 @@ spring:
 server:
   port: 8083
 
+customer:
+  endpoint: http://localhost:8081
+
+sign:
+  tempdirectory: target/generated-sources/temp
+
+aws:
+  region: eu-north-1
+  roleArn: arn:aws:iam::442042545308:role/gespyme-s3
+  roleSessionName: invoiceServiceSession
+  s3:
+    pendingkeypath: invoice/pending/
+    signedkeypath: invoice/signed/
+    bucketname: gespyme-invoice
+
+autofirma:
+  certificatepath: src/main/resources/
+  certificatename: company-cert.p12
+  filter: company-sign-certificate
+  password: admin-gespyme-2024-99Pabcde
+  outputfilepath: target/generated-sources/temp/signed/
+  inputfilepath: target/generated-sources/temp/created/
+
+pdf:
+  sourcepath: src/main/resources/FACTURA.pdf
+  destinationpath:

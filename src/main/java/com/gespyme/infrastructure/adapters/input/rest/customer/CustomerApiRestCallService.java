@@ -7,6 +7,7 @@ import com.gespyme.rest.RestRequest;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -14,9 +15,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CustomerApiRestCallService implements CustomerFacade {
 
-  // TODO
-  // @Value("${customer.endpoint}")
-  private String customerEndpoint = "http://localhost:8081";
+  @Value("${customer.endpoint}")
+  private String customerEndpoint;
 
   private final RestCallService<CustomerModelApi, CustomerModelApi> restService;
   ParameterizedTypeReference<List<CustomerModelApi>> typeReference =

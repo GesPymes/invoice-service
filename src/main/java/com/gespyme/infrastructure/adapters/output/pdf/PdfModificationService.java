@@ -10,20 +10,17 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PdfModificationService {
-  /*
-     @Value("${pdf.source.path}")
-     private String sourcePath;
 
-     @Value("${pdf.destination.path}")
-     private String destinationPath;
-  */
+     @Value("${pdf.sourcepath}")
+     private String sourceFile;
 
   public byte[] createInvoicePdf(InvoiceData invoiceData) {
-    try (PDDocument document = Loader.loadPDF(new File("src/main/resources/FACTURA.pdf"))) {
+    try (PDDocument document = Loader.loadPDF(new File(sourceFile))) {
       PDPage page = document.getPage(0);
       try (PDPageContentStream contentStream =
           new PDPageContentStream(
@@ -41,7 +38,6 @@ public class PdfModificationService {
         insertText(contentStream, 470, 148, invoiceData.getTaxRate().toString() + "%");
         insertText(contentStream, 470, 124, invoiceData.getTotalAmount().toString());
       }
-      // document.save(new File("src/main/resources/FACTURA2.pdf"));
       try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
         document.save(outputStream);
         return outputStream.toByteArray();
