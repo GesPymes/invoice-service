@@ -1,0 +1,4769 @@
+{
+	"info": {
+		"_postman_id": "7bf7edc2-1e1d-4c7e-8adb-1e8caee8280b",
+		"name": "invoice-microservice",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "InvoiceTest Suite",
+			"item": [
+				{
+					"name": "InvoiceData",
+					"item": [
+						{
+							"name": "Create",
+							"item": [
+								{
+									"name": "OK - Invoice- Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Create",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 201\", function () {\r",
+															"    pm.response.to.have.status(201); \r",
+															"});\r",
+															"\r",
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"invoice_data_id\", jsonData.invoiceDataId);"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"customerId\" : \"{{customer_id}}\",\r\n  \"appointmentId\" : \"{{appointment_id}}\",\r\n  \"subtotalAmount\": 4,\r\n  \"taxRate\" : 21,\r\n  \"totalAmount\": 2,\r\n  \"description\": \"Invoice 1\"\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Create Order",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 201\", function () {\r",
+															"    pm.response.to.have.status(201); \r",
+															"});\r",
+															"\r",
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"invoice_order_id\", jsonData.invoiceOrderId);"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"invoiceDataId\" : \"{{invoice_data_id}}\", \r\n  \"appointmentId\" : \"{{appointment_id}}\",\r\n  \"status\": \"CREATED\"\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "KO- Create invoice- KO multiple fields",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "CreateInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"All params  not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.description).to.include(\"Params: [taxRate, totalAmount, customerId, description] cannot be null\"); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 400\", function () {\r",
+															"    pm.response.to.have.status(400); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"appointmentId\" : \"appointment_2\",\r\n  \"subtotalAmount\": 0\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "KO- Create invoice- KO subtotalAmount",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "CreateInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"needsInvoice not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.description).to.include(\"Param subtotalAmount cannot be null\"); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 400\", function () {\r",
+															"    pm.response.to.have.status(400); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"customerId\" : \"{{customer_id}}\",\r\n  \"taxRate\" : 21,\r\n  \"totalAmount\": 4,\r\n  \"description\": \"Invoice 1\"\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "KO- Create invoice- KO taxRate",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "CreateInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"taxRate not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.description).to.include(\"Param taxRate cannot be null\"); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 400\", function () {\r",
+															"    pm.response.to.have.status(400); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"customerId\" : \"{{customer_id}}\",\r\n  \"appointmentId\" : \"appointment_2\",\r\n  \"subtotalAmount\": 0,\r\n  \"totalAmount\": 2,\r\n  \"description\": \"Invoice 1\"\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "KO- Create invoice- KO totalamount",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "CreateInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Customer not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.description).to.include(\"Param totalAmount cannot be null\"); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 400\", function () {\r",
+															"    pm.response.to.have.status(400); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"customerId\" : \"{{customer_id}}\",\r\n  \"appointmentId\" : \"appointment_2\",\r\n  \"subtotalAmount\": 0,\r\n  \"taxRate\" : 21,\r\n  \"description\": \"Invoice 1\"\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "KO - Create invoice- Description",
+									"item": [
+										{
+											"name": "GetToken User",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "CreateInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"\r",
+															"pm.test(\"Status code is 403\", function () {\r",
+															"    pm.response.to.have.status(403); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{user_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"customerId\" : \"{{customer_id}}\",\r\n  \"appointmentId\" : \"appointment_2\",\r\n  \"subtotalAmount\": 0,\r\n  \"taxRate\" : 21,\r\n  \"totalAmount\": 2\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Patch",
+							"item": [
+								{
+									"name": "OK - Patch subtotal amount - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "PatchInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Patch subtotalAmount\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.subtotalAmount).eq(1); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"subtotalAmount\": 1\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData/{{invoice_data_id}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData",
+														"{{invoice_data_id}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - Patch taxRate - User",
+									"item": [
+										{
+											"name": "GetToken User",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "PatchInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Patch taxRate\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.taxRate).eq(19); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"taxRate\" : 19\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData/{{invoice_data_id}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData",
+														"{{invoice_data_id}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - Patch totalAmount - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "PatchInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Patch totalAmount\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.totalAmount).eq(3); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"totalAmount\": 3\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData/{{invoice_data_id}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData",
+														"{{invoice_data_id}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - Patch description - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "PatchInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Patch description\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.description).to.include(\"Invoice 1\"); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"description\": \"Invoice 1\"\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData/{{invoice_data_id}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData",
+														"{{invoice_data_id}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - Patch various filters - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "PatchInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});\r",
+															"\r",
+															"\r",
+															"pm.test(\"Patch taxRate\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.subtotalAmount).eq(0); \r",
+															"     pm.expect(jsonData.taxRate).eq(10);\r",
+															"     pm.expect(jsonData.totalAmount).eq(10);\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n   \"subtotalAmount\": 0,\r\n  \"taxRate\" : 10,\r\n  \"totalAmount\": 10\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData/{{invoice_data_id}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData",
+														"{{invoice_data_id}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Find",
+							"item": [
+								{
+									"name": "OK - Find subtotal amount - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "FindInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Find subtotalAmount\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"\r",
+															"    pm.expect(jsonData[0].subtotalAmount).eq(4); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData?subtotalAmount=4",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData"
+													],
+													"query": [
+														{
+															"key": "subtotalAmount",
+															"value": "4"
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - Find taxRate - User",
+									"item": [
+										{
+											"name": "GetToken User",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "FindInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Find taxRate\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData[0].taxRate).eq(19); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData"
+													],
+													"query": [
+														{
+															"key": "taxRate",
+															"value": "19",
+															"disabled": true
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - Find totalAmount - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "FindInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Find totalAmount\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"     pm.expect(jsonData[0].totalAmount).eq(3); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData?totalAmount=3",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData"
+													],
+													"query": [
+														{
+															"key": "totalAmount",
+															"value": "3"
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - Find description - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "FindInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Find description\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData[0].description).to.include(\"Invoice 1\"); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData?description=Invoice 1",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData"
+													],
+													"query": [
+														{
+															"key": "description",
+															"value": "Invoice 1"
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - Find status - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "FindInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Find status\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData[0].status).to.include(\"CREATED\"); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData?status=CREATED",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData"
+													],
+													"query": [
+														{
+															"key": "status",
+															"value": "CREATED"
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - Find various filters - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "FindInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});\r",
+															"\r",
+															"\r",
+															"pm.test(\"Find taxRate\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.taxRate).eq(10); \r",
+															"     pm.expect(jsonData.totalAmount).eq(4);\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"taxRate\" : 10,\r\n   \"totalAmount\": 4\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData?taxRate=10&totalAmount=4",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData"
+													],
+													"query": [
+														{
+															"key": "taxRate",
+															"value": "10"
+														},
+														{
+															"key": "totalAmount",
+															"value": "4"
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "GetById",
+							"item": [
+								{
+									"name": "KO - GetById - User",
+									"item": [
+										{
+											"name": "GetToken User",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "GetById",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 403\", function () {\r",
+															"    pm.response.to.have.status(403); \r",
+															"});\r",
+															"\r",
+															""
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{user_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData/{{invoice_data_id}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData",
+														"{{invoice_data_id}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "KO - GetById - invalid customer Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "GetById",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 404\", function () {\r",
+															"    pm.response.to.have.status(404); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Invalid customer\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.description).to.include(\"InvoiceData invalid not found\"); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData/invalid",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData",
+														"invalid"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - Get by id - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "GetById",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData/{{invoice_data_id}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData",
+														"{{invoice_data_id}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Delete Invoice",
+							"item": [
+								{
+									"name": "KO - delete - User",
+									"item": [
+										{
+											"name": "GetToken User",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "DeleteInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 403\", function () {\r",
+															"    pm.response.to.have.status(403); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{user_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData/{{invoice_data_id}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData",
+														"{{invoice_data_id}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "KO - delete customer - invalid user Admin",
+									"item": [
+										{
+											"name": "GetToken User",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "DeleteInvoice",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 404\", function () {\r",
+															"    pm.response.to.have.status(404); \r",
+															"});\r",
+															""
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData/invalid",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData",
+														"invalid"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - Delete by id - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "DeleteCustomer",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 204\", function () {\r",
+															"    pm.response.to.have.status(204); \r",
+															"});\r",
+															""
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData/{{invoice_data_id}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData",
+														"{{invoice_data_id}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "InvoiceOrder",
+					"item": [
+						{
+							"name": "Create",
+							"item": [
+								{
+									"name": "OK - Invoice- Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Create",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 201\", function () {\r",
+															"    pm.response.to.have.status(201); \r",
+															"});\r",
+															"\r",
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"invoice_order_id_to_patch\", jsonData.invoiceOrderId);"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"invoiceDataId\" : \"{{invoice_data_id}}\", \r\n  \"appointmentId\" : \"{{appointment_id}}\",\r\n  \"status\": \"CREATED\"\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Patch",
+							"item": [
+								{
+									"name": "OK - Patch status - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Create Copy",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 201\", function () {\r",
+															"    pm.response.to.have.status(201); \r",
+															"});\r",
+															"\r",
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"invoice_order_id\", jsonData.invoiceOrderId);"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"invoiceDataId\" : \"{{invoice_data_id}}\", \r\n  \"appointmentId\" : \"{{appointment_id}}\",\r\n  \"status\": \"CREATED\"\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "PatchInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Patch status\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.status).to.include(\"DELETED\"); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"status\": \"DELETED\"\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder/{{invoice_order_id_to_patch}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder",
+														"{{invoice_order_id_to_patch}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "GetById",
+							"item": [
+								{
+									"name": "KO - GetById - User",
+									"item": [
+										{
+											"name": "GetToken User",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "GetById",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 403\", function () {\r",
+															"    pm.response.to.have.status(403); \r",
+															"});\r",
+															"\r",
+															""
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{user_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData/{{invoice_order_id}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData",
+														"{{invoice_order_id}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "KO - GetById - invalid customer Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "GetById",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 404\", function () {\r",
+															"    pm.response.to.have.status(404); \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Invalid customer\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.description).to.include(\"InvoiceData invalid not found\"); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceData/invalid",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceData",
+														"invalid"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - Get by id - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "GetById",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder/{{invoice_order_id}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder",
+														"{{invoice_order_id}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "sign",
+							"item": [
+								{
+									"name": "KO - sign - User",
+									"item": [
+										{
+											"name": "GetToken User",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Sing invoice",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 403\", function () {\r",
+															"    pm.response.to.have.status(403); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{user_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder/{{invoice_order_id}}/sign",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder",
+														"{{invoice_order_id}}",
+														"sign"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - sign - Admin",
+									"item": [
+										{
+											"name": "GetToken User",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Sing invoice",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 204\", function () {\r",
+															"    pm.response.to.have.status(204); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder/{{invoice_order_id}}/sign",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder",
+														"{{invoice_order_id}}",
+														"sign"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "KO - sign - Invalid invoice admin",
+									"item": [
+										{
+											"name": "GetToken User",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Sing invoice",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 403\", function () {\r",
+															"    pm.response.to.have.status(403); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{user_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder/invalid/sign",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder",
+														"invalid",
+														"sign"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "download",
+							"item": [
+								{
+									"name": "KO - download - User",
+									"item": [
+										{
+											"name": "GetToken User",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Download invoice",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 403\", function () {\r",
+															"    pm.response.to.have.status(403); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{user_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder/Invoice-{{invoice_order_id}}-signed.pdf/download",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder",
+														"Invoice-{{invoice_order_id}}-signed.pdf",
+														"download"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - download - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Download invoice",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});\r",
+															""
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder/Invoice-{{invoice_order_id}}-signed.pdf/download",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder",
+														"Invoice-{{invoice_order_id}}-signed.pdf",
+														"download"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "KO - download - Invalid invoice admin",
+									"item": [
+										{
+											"name": "GetToken User",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Download invoice",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 403\", function () {\r",
+															"    pm.response.to.have.status(403); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{user_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder/Invoice-{{invoice_order_id}}-signed.pdf/download",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder",
+														"Invoice-{{invoice_order_id}}-signed.pdf",
+														"download"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Delete Invoice",
+							"item": [
+								{
+									"name": "KO - delete - User",
+									"item": [
+										{
+											"name": "GetToken User",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Create",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 201\", function () {\r",
+															"    pm.response.to.have.status(201); \r",
+															"});\r",
+															"\r",
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"invoice_order_id\", jsonData.invoiceOrderId);"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"invoiceDataId\" : \"022aa146-edcb-48e8-b500-df612b0fc751\", \r\n  \"appointmentId\" : \"appointment_2\",\r\n  \"status\": \"CREATED\"\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "DeleteInvoiceData",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 403\", function () {\r",
+															"    pm.response.to.have.status(403); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{user_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder/{{invoice_order_id}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder",
+														"{{invoice_order_id}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "KO - delete customer - invalid invoiceAdmin",
+									"item": [
+										{
+											"name": "GetToken User Copy",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"gespyme.employee@gmail.com\",\r\n    \"password\" : \"employee-gespyme-2024-99Qabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "DeleteInvoice",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 404\", function () {\r",
+															"    pm.response.to.have.status(404); \r",
+															"});\r",
+															""
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder/invalid",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder",
+														"invalid"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OK - Delete by id - Admin",
+									"item": [
+										{
+											"name": "GetToken Admin",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"admin_token\", \"Bearer \" + jsonData.token);\r",
+															"\r",
+															"pm.test(\"Token not null\", function () {\r",
+															"    const jsonData = pm.response.json(); \r",
+															"    pm.expect(jsonData.token).not.null; \r",
+															"});\r",
+															"\r",
+															"pm.test(\"Status code is 200\", function () {\r",
+															"    pm.response.to.have.status(200); \r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"email\" : \"admi.gespyme@gmail.com\",\r\n    \"password\" : \"admin-gespyme-2024-99Pabcde\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8082/login",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8082",
+													"path": [
+														"login"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Create",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 201\", function () {\r",
+															"    pm.response.to.have.status(201); \r",
+															"});\r",
+															"\r",
+															"var jsonData = JSON.parse(responseBody);\r",
+															"pm.globals.set(\"invoice_order_id\", jsonData.invoiceOrderId);"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"invoiceDataId\" : \"022aa146-edcb-48e8-b500-df612b0fc751\", \r\n  \"appointmentId\" : \"appointment_2\",\r\n  \"status\": \"CREATED\"\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "DeleteInvoice",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.request.headers.add({\r",
+															"    key: 'Authorization',\r",
+															"    value: 'Bearer ' + pm.environment.get(\"token\")\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 204\", function () {\r",
+															"    pm.response.to.have.status(204); \r",
+															"});\r",
+															""
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "{{admin_token}}",
+														"type": "default"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8083/invoiceOrder/{{invoice_order_id}}",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8083",
+													"path": [
+														"invoiceOrder",
+														"{{invoice_order_id}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}
