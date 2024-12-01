@@ -12,13 +12,13 @@ import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider
 public class AwsConfig {
 
   @Value("${aws.roleArn}")
-  private  String roleArn;
+  private String roleArn;
 
   @Value("${aws.region}")
-  private  String region;
+  private String region;
 
   @Value("${aws.roleSessionName}")
-  private  String roleSessionName;
+  private String roleSessionName;
 
   @Bean
   public StsAssumeRoleCredentialsProvider getCredentialsProvider() {
@@ -33,6 +33,9 @@ public class AwsConfig {
 
   @Bean
   public S3Client s3Client(StsAssumeRoleCredentialsProvider credentialsProvider) {
-    return S3Client.builder().region(Region.of(region)).credentialsProvider(credentialsProvider).build();
+    return S3Client.builder()
+        .region(Region.of(region))
+        .credentialsProvider(credentialsProvider)
+        .build();
   }
 }

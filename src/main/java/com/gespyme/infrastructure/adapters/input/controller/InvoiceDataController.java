@@ -60,7 +60,7 @@ public class InvoiceDataController {
     return ResponseEntity.created(location).body(invoiceDataMapper.map(invoiceData));
   }
 
-  @PatchMapping("/{invoiceDatabId}")
+  @PatchMapping("/{invoiceDataId}")
   public ResponseEntity<InvoiceDataModelApi> modifyInvoiceData(
       @PathVariable("invoiceDataId") String invoiceDataId,
       @RequestBody InvoiceDataModelApi invoiceDataApiModel) {

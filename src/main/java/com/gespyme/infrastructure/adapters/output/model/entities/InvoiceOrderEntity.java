@@ -15,6 +15,7 @@ import lombok.Setter;
 public class InvoiceOrderEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(name = "invoice_order_id")
   private String invoiceOrderId;
 
   @Column(name = "invoice_data_id")

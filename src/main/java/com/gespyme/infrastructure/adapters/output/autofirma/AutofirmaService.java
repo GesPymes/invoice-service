@@ -85,8 +85,7 @@ public class AutofirmaService {
         .append(" -filter ")
         .append(filter)
         .append(" -password ")
-        .append(password)
-            .append("> log.log");
+        .append(password);
     return sb.toString();
   }
 
