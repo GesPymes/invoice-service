@@ -18,12 +18,14 @@ public class InvoiceOrderEntity {
   @Column(name = "invoice_order_id")
   private String invoiceOrderId;
 
-  @Column(name = "invoice_data_id")
-  private String invoiceDataId;
-
   @Column(name = "appointment_id")
   private String appointmentId;
 
   @Column(name = "status")
   private String status;
+
+  @ManyToOne
+  @JoinColumn(name = "invoice_data_id", nullable = false)
+  private InvoiceDataEntity invoiceData;
+
 }

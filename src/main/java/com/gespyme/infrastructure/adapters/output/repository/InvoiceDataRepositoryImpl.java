@@ -44,20 +44,18 @@ public class InvoiceDataRepositoryImpl implements InvoiceDataRepository {
   @Override
   public List<InvoiceData> findByCriteria(List<SearchCriteria> searchCriteria) {
     QInvoiceDataEntity invoiceData = QInvoiceDataEntity.invoiceDataEntity;
-    QInvoiceOrderEntity invoiceOrder = QInvoiceOrderEntity.invoiceOrderEntity;
 
     JPAQuery<InvoiceDataEntity> query =
         queryFactory
             .select(invoiceData)
-            .from(invoiceData)
-            .join(invoiceData.invoiceOrder, invoiceOrder);
+            .from(invoiceData);
     BooleanBuilder booleanBuilder = getPredicates(searchCriteria);
     List<Tuple> result =
         Objects.nonNull(booleanBuilder.getValue())
-            ? executeQueryWithPredicate(invoiceData, invoiceOrder, booleanBuilder, query)
-            : executeQueryWithoutPredicate(invoiceData, invoiceOrder, query);
+            ? executeQueryWithPredicate(invoiceData, booleanBuilder, query)
+            : executeQueryWithoutPredicate(invoiceData, query);
     return result.stream()
-        .map(tuple -> mapTuple(tuple, invoiceData, invoiceOrder))
+        .map(tuple -> mapTuple(tuple, invoiceData))
         .collect(Collectors.toList());
   }
 
@@ -70,42 +68,44 @@ public class InvoiceDataRepositoryImpl implements InvoiceDataRepository {
 
   private List<Tuple> executeQueryWithPredicate(
       QInvoiceDataEntity invoiceData,
-      QInvoiceOrderEntity invoiceOrder,
       BooleanBuilder booleanBuilder,
       JPAQuery<InvoiceDataEntity> query) {
     return query
         .select(
+                invoiceData.invoiceDataId,
+                invoiceData.appointmentId,
             invoiceData.subtotalAmount,
             invoiceData.taxRate,
             invoiceData.totalAmount,
-            invoiceData.description,
-            invoiceOrder.status)
+            invoiceData.description)
         .where(booleanBuilder)
         .fetch();
   }
 
   private List<Tuple> executeQueryWithoutPredicate(
       QInvoiceDataEntity invoiceData,
-      QInvoiceOrderEntity invoiceOrder,
       JPAQuery<InvoiceDataEntity> query) {
     return query
         .select(
+                invoiceData.invoiceDataId,
+            invoiceData.appointmentId,
             invoiceData.subtotalAmount,
             invoiceData.taxRate,
             invoiceData.totalAmount,
-            invoiceData.description,
-            invoiceOrder.status)
+            invoiceData.description)
         .fetch();
   }
 
   private InvoiceData mapTuple(
-      Tuple tuple, QInvoiceDataEntity invoiceData, QInvoiceOrderEntity invoiceOrder) {
+      Tuple tuple, QInvoiceDataEntity invoiceData) {
     return InvoiceData.builder()
+            .appointmentId(tuple.get(invoiceData.appointmentId))
+            .customerId(tuple.get(invoiceData.customerId))
+            .invoiceDataId(tuple.get(invoiceData.invoiceDataId))
         .subtotalAmount(tuple.get(invoiceData.subtotalAmount))
         .totalAmount(tuple.get(invoiceData.totalAmount))
         .description(tuple.get(invoiceData.description))
         .taxRate(tuple.get(invoiceData.taxRate))
-        .status(tuple.get(invoiceOrder.status))
         .build();
   }
 

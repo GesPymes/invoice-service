@@ -5,5 +5,5 @@ import com.gespyme.domain.invoiceorder.model.InvoiceOrderFilter;
 import java.util.List;
 
 public interface FindInvoiceOrderUseCase {
-  List<InvoiceOrder> findInvoiceOrder(InvoiceOrderFilter invoiceFilter);
+  List<InvoiceOrder> findInvoiceOrder(String invoiceDataId, InvoiceOrderFilter invoiceFilter);
 }

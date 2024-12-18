@@ -37,7 +37,6 @@ public class InvoiceDataEntity {
   @Column(name = "description")
   private String description;
 
-  @OneToMany
-  @JoinColumn(name = "invoice_data_id")
+  @OneToMany(mappedBy = "invoiceData", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private List<InvoiceOrderEntity> invoiceOrder;
 }

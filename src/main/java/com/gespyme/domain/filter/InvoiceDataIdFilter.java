@@ -9,10 +9,10 @@ import java.util.Objects;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InvoiceOrderStatusFilter implements FieldFilter<InvoiceOrderFilter> {
+public class InvoiceDataIdFilter implements FieldFilter<InvoiceOrderFilter> {
   @Override
   public boolean apply(InvoiceOrderFilter invoiceOrderFilter) {
-    return Objects.nonNull(invoiceOrderFilter.getStatus());
+    return true;
   }
 
   @Override
@@ -20,9 +20,9 @@ public class InvoiceOrderStatusFilter implements FieldFilter<InvoiceOrderFilter>
       InvoiceOrderFilter invoiceOrderFilter, List<SearchCriteria> searchCriteriaList) {
     searchCriteriaList.add(
         SearchCriteria.builder()
-            .key("status")
+            .key("invoice_data_id")
             .operation(SearchOperation.EQUAL)
-            .value(invoiceOrderFilter.getStatus())
+            .value(invoiceOrderFilter.getInvoiceDataId())
             .build());
   }
 }

@@ -7,4 +7,5 @@ import lombok.Data;
 @Builder
 public class InvoiceOrderFilter {
   private String status;
+  private String invoiceDataId;
 }

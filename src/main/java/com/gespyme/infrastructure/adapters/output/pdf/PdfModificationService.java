@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class PdfModificationService {
 
-     @Value("${pdf.sourcepath}")
-     private String sourceFile;
+  @Value("${pdf.sourcepath}")
+  private String sourceFile;
 
   public byte[] createInvoicePdf(InvoiceData invoiceData) {
     try (PDDocument document = Loader.loadPDF(new File(sourceFile))) {
